@@ -15,7 +15,7 @@ canvas.grid(column=0, row=0)
 
 ball = Ball(62, 36)
 
-paddle = Paddle(1, 0)
+racket = Racket(1, 0)
 
 blocks = list()
 
@@ -25,7 +25,7 @@ for i in range(3):
     for j in range(14):
         blocks.append(Block(BLOCK_START_POS_X + j * (Block.size_x + 1), BLOCK_START_POS_Y + i * (Block.size_y + 1)))
 
-manager = ArkanoidManager(window, canvas, ball, paddle, blocks)
-manager.loop()
+manager = ArkanoidManager(window, canvas, ball, racket, blocks)
+manager.initialize()
 
 window.mainloop()
