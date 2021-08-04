@@ -9,7 +9,7 @@ class Ball(Object):
 
 class Paddle(Object):
     name = 'Paddle'
-    size_x = 8
+    size_x = 10
     size_y = 1
 
 
