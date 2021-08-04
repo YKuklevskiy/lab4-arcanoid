@@ -3,4 +3,4 @@
 .idea/modules.xml
 venv/
 .idea/vcs.xml
-Classes/
+Classes/__pycache__/
