@@ -9,15 +9,16 @@ from Classes.Objects import *
 window = Tk()
 window.title('Arcanoid')
 
-canvas = Canvas(window, width=1000, height=600, bg='black') # as a tile is 8x8, the field is 125*75
+# as a tile is 8x8, the field is 125*75
+canvas = Canvas(window, width=1000, height=600, bg='black', highlightthickness=0)
+canvas.grid(column=0, row=0)
 
-canvas.pack()
-ball_instance = canvas.create_rectangle(8, 8, 16, 16, fill='white')
+ball = Ball(62, 36)
+ball.create_object(canvas)
 
-ball = Ball(1, 1, ball_instance)
+paddle = Paddle(1, 0)
+paddle.create_object(canvas)
 
-# cur_coords = canvas.coords(ball)
-# canvas.coords(ball, cur_coords[0]+8, cur_coords[1]+8, cur_coords[2]+8, cur_coords[3]+8)
+# print(canvas.coords(ball.instance)) # for debug
 
 window.mainloop()
-
