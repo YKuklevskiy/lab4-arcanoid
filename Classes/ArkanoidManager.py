@@ -67,6 +67,14 @@ class ArkanoidManager:
             if arrow_keys_state[1]:
                 self.ball.speed[0] += self.racket.speed
 
+            collision_x, collision_y = self.ball.collision(self.racket, self.ball.speed[0], self.ball.speed[1])
+            if type(collision_x) != type(bool):
+                ball_velocity = (self.ball.speed[0]**2+self.ball.speed[1]**2)**0.5
+                collision_distance = ((self.ball.x-collision_x)**2+(self.ball.y-collision_y)**2)**0.5
+                angle = (self.ball.y-collision_y)/collision_distance
+                # calculations wrong, bottom left border of ball doesn't collide with bottom left border of object
+                # have to account
+
             # if not upper racket collision or corner collision, then ball always bounces down to its doom
             # thus no reason to check side collision
 

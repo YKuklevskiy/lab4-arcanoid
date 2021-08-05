@@ -44,7 +44,9 @@ class Object:
         self.x += delta_x
         self.y += delta_y
 
-    def collides(self, victim, speed_x, speed_y):
+    # returns False, False if no collision is present,
+    # or coordinates of a tile where collision occurs
+    def collision(self, victim, speed_x, speed_y):
         speed_x = int(speed_x)
         speed_y = int(speed_y)
         victim_boundaries = [victim.x,
@@ -56,8 +58,6 @@ class Object:
                            self.x + self.size_x + speed_x,
                            self.y + self.size_y + speed_y]
 
-        ans = False
-
         if speed_x > speed_y:
             for i in range(0, speed_x + sgn(speed_x), sgn(speed_x)):
                 # using separating axis theorem to detect rectangle collision
@@ -65,7 +65,7 @@ class Object:
                         or victim_boundaries[3] <= self_boundaries[1] + round(i/float(speed_x))
                         or victim_boundaries[0] >= self_boundaries[2] + i
                         or victim_boundaries[1] >= self_boundaries[3] + round(i/float(speed_x))):
-                    return True
+                    return self_boundaries[0] + i, self_boundaries[1] + round(i/float(speed_x))
         else:
             for i in range(0, speed_y + sgn(speed_y), sgn(speed_y)):
                 # using separating axis theorem to detect rectangle collision
@@ -73,5 +73,5 @@ class Object:
                         or victim_boundaries[3] <= self_boundaries[1] + i
                         or victim_boundaries[0] >= self_boundaries[2] + round(i / float(speed_y))
                         or victim_boundaries[1] >= self_boundaries[3] + i):
-                    return True
-        return False
+                    return self_boundaries[0] + round(i / float(speed_y)), self_boundaries[1] + i
+        return False, False
