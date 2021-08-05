@@ -35,3 +35,19 @@ class Object:
     def move_object(self, delta_x, delta_y):
         self.x += delta_x
         self.y += delta_y
+
+    def collides(self, victim, speed_x, speed_y):
+        victim_boundaries = [victim.x,
+                             victim.y,
+                             victim.x + victim.size_x,
+                             victim.y + victim.size_y]
+        self_boundaries = [self.x + speed_x,
+                           self.y + speed_y,
+                           self.x + self.size_x + speed_x,
+                           self.y + self.size_y + speed_y]
+
+        # using separating axis theorem to detect rectangle collision
+        return (victim_boundaries[2] <= self_boundaries[0]
+                or victim_boundaries[3] <= self_boundaries[1]
+                or victim_boundaries[0] >= self_boundaries[2]
+                or victim_boundaries[1] >= self_boundaries[3])

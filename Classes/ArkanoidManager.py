@@ -53,10 +53,44 @@ class ArkanoidManager:
         else:  # wait a tick
             self.mv_intervals[0] += 1
 
+    # check collision, return final ball displacement
     def check_collision(self):
-        delta_x = 0
-        delta_y = 0
-        # check collision, return final ball displacement
+        speed = self.ball.speed
+        delta_x = speed[0]
+        delta_y = speed[1]
+        collision_direction = [False, False, False, False]  # left, up, right, down
+
+        # check racket collision
+
+        # check blocks collision
+
+        # todo currently won't work if ball collides with object then wall successively,
+        #  fix with using not the speed of ball to check wall collision but with deltas
+        # check wall collision
+        if speed[0] > 0:
+            if self.ball.x + speed[0] + self.ball.size_x > self.field[0]:  # right collision
+                delta_x = self.field[0] - self.ball.x - speed[0] - self.ball.size_x
+                collision_direction[2] = True
+        else:
+            if self.ball.x + speed[0] < 0:  # left collision
+                delta_x = -self.ball.x - speed[0]
+                collision_direction[0] = True
+
+        if speed[1] > 0:
+            if self.ball.y + speed[1] + self.ball.size_y > self.field[1]:  # up collision
+                delta_y = self.field[1] - self.ball.y - speed[1] - self.ball.size_y
+                collision_direction[1] = True
+
+        else:
+            if self.ball.y + speed[1] < 0:  # down collision
+                delta_y = -self.ball.y - speed[1]
+                collision_direction[3] = True
+
+        if collision_direction[0] != collision_direction[2]:
+            self.ball.speed[0] *= -1
+        if collision_direction[1] != collision_direction[3]:
+            self.ball.speed[1] *= -1
+
         return delta_x, delta_y
         pass
 
@@ -75,7 +109,7 @@ class ArkanoidManager:
 
     def calculate(self):
         self.racket_movement()
-        # self.ball_movement()
+        self.ball_movement()
         pass
 
     _TICK = 20  # time between frames
