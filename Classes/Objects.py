@@ -5,15 +5,15 @@ class Ball(Object):
     name = 'Ball'
     size_x = 1
     size_y = 1
-    movement_interval = 2  # ticks between movement
-    speed = [1, 1]
+    movement_interval = 3  # ticks between movement
+    speed = [1, 2]
 
 
 class Racket(Object):
     name = 'Racket'
     size_x = 10
     size_y = 1
-    movement_interval = 1
+    movement_interval = 2
     speed = 1
 
 

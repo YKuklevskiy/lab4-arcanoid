@@ -69,21 +69,23 @@ class ArkanoidManager:
         # check wall collision
         if speed[0] > 0:
             if self.ball.x + speed[0] + self.ball.size_x > self.field[0]:  # right collision
-                delta_x = self.field[0] - self.ball.x - speed[0] - self.ball.size_x
+                delta_x = (self.field[0] - self.ball.x - speed[0] - self.ball.size_x)\
+                          + (self.field[0] - self.ball.x - self.ball.size_x)
                 collision_direction[2] = True
         else:
             if self.ball.x + speed[0] < 0:  # left collision
-                delta_x = -self.ball.x - speed[0]
+                delta_x = (-self.ball.x - speed[0]) - self.ball.x
                 collision_direction[0] = True
 
         if speed[1] > 0:
             if self.ball.y + speed[1] + self.ball.size_y > self.field[1]:  # up collision
-                delta_y = self.field[1] - self.ball.y - speed[1] - self.ball.size_y
+                delta_y = (self.field[1] - self.ball.y - speed[1] - self.ball.size_y)\
+                          + (self.field[1] - self.ball.y - self.ball.size_y)
                 collision_direction[1] = True
 
         else:
             if self.ball.y + speed[1] < 0:  # down collision
-                delta_y = -self.ball.y - speed[1]
+                delta_y = (-self.ball.y - speed[1]) - self.ball.y
                 collision_direction[3] = True
 
         if collision_direction[0] != collision_direction[2]:
@@ -112,7 +114,7 @@ class ArkanoidManager:
         self.ball_movement()
         pass
 
-    _TICK = 20  # time between frames
+    _TICK = 10  # time between frames
 
     def loop(self):
         self.calculate()
