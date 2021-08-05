@@ -61,32 +61,58 @@ class ArkanoidManager:
         collision_direction = [False, False, False, False]  # left, up, right, down
 
         # check racket collision
+        if self.ball.collides(self.racket, speed[0], speed[1]):
+            if arrow_keys_state[0]:
+                self.ball.speed[0] -= self.racket.speed
+            if arrow_keys_state[1]:
+                self.ball.speed[0] += self.racket.speed
+
+            # if not upper racket collision or corner collision, then ball always bounces down to its doom
+            # thus no reason to check side collision
+
+            # difficulties in handling collision: is it corner collision,
+            # which way and how far will the collision send ball, etc
+            # it would be better to create a class just for handling collisions,
+            # this will improve code readability and make things easier
+
+            # if side collision, only one delta changes, if corner - both deltas change, the most easy way to do
+            # all that is to create a function returning new delta coords in collision class (as objects are rectangles)
+
+            #
+            # # check if upper bound collision
+            # distance_y = self.ball.y - self.racket.y - self.racket.size_y
+            # if self.ball.x >= self.racket.x + self.racket.size_x:
+            #     distance_x = self.ball.x - self.racket.x - self.racket.size_x
+            #     if float(distance_x)/distance_y == abs(float(speed[0])/speed[1]):  # corner collision
+            #         delta_x = (self.racket.x + self.racket.size_x - self.ball.x + delta_x)\
+            #                   - (self.ball.x - self.racket.x - self.racket.size_x)
+            #         collision_direction[0] = True
+            #
+            # elif self.ball.x <= self.racket.x:
+            #     distance_x = self.racket.x - self.ball.x - self.ball.size_x
+            #     if
 
         # check blocks collision
 
-        # todo currently won't work if ball collides with object then wall successively,
-        #  fix with using not the speed of ball to check wall collision but with deltas
         # check wall collision
-        if speed[0] > 0:
-            if self.ball.x + speed[0] + self.ball.size_x > self.field[0]:  # right collision
-                delta_x = (self.field[0] - self.ball.x - speed[0] - self.ball.size_x)\
+        if delta_x > 0:
+            if self.ball.x + delta_x + self.ball.size_x > self.field[0]:  # right collision
+                delta_x = (self.field[0] - self.ball.x - delta_x - self.ball.size_x)\
                           + (self.field[0] - self.ball.x - self.ball.size_x)
-                collision_direction[2] = True
+                collision_direction[2] = not collision_direction[2]
         else:
-            if self.ball.x + speed[0] < 0:  # left collision
-                delta_x = (-self.ball.x - speed[0]) - self.ball.x
-                collision_direction[0] = True
-
-        if speed[1] > 0:
-            if self.ball.y + speed[1] + self.ball.size_y > self.field[1]:  # up collision
-                delta_y = (self.field[1] - self.ball.y - speed[1] - self.ball.size_y)\
+            if self.ball.x + delta_x < 0:  # left collision
+                delta_x = (-self.ball.x - delta_x) - self.ball.x
+                collision_direction[0] = not collision_direction[0]
+        if delta_y > 0:
+            if self.ball.y + delta_y + self.ball.size_y > self.field[1]:  # up collision
+                delta_y = (self.field[1] - self.ball.y - delta_y - self.ball.size_y)\
                           + (self.field[1] - self.ball.y - self.ball.size_y)
-                collision_direction[1] = True
-
+                collision_direction[1] = not collision_direction[1]
         else:
-            if self.ball.y + speed[1] < 0:  # down collision
-                delta_y = (-self.ball.y - speed[1]) - self.ball.y
-                collision_direction[3] = True
+            if self.ball.y + delta_y < 0:  # down collision
+                delta_y = (-self.ball.y - delta_y) - self.ball.y
+                collision_direction[3] = not collision_direction[3]
 
         if collision_direction[0] != collision_direction[2]:
             self.ball.speed[0] *= -1
@@ -97,17 +123,21 @@ class ArkanoidManager:
         pass
 
     def racket_movement(self):
-        if arrow_keys_state[0] != arrow_keys_state[1]:
-            if arrow_keys_state[0]:
-                if self.racket.x - self.racket.speed < 0:
-                    self.racket.x = 0
+        if self.mv_intervals[1] >= self.racket.movement_interval - 1:  # ready to move
+            if arrow_keys_state[0] != arrow_keys_state[1]:
+                if arrow_keys_state[0]:
+                    if self.racket.x - self.racket.speed < 0:
+                        self.racket.x = 0
+                    else:
+                        self.racket.move_object(-self.racket.speed, 0)
                 else:
-                    self.racket.move_object(-self.racket.speed, 0)
-            else:
-                if self.racket.x + self.racket.speed + self.racket.size_x > self.field[0]:
-                    self.racket.x = self.field[0] - self.racket.size_x
-                else:
-                    self.racket.move_object(self.racket.speed, 0)
+                    if self.racket.x + self.racket.speed + self.racket.size_x > self.field[0]:
+                        self.racket.x = self.field[0] - self.racket.size_x
+                    else:
+                        self.racket.move_object(self.racket.speed, 0)
+            self.mv_intervals[1] = 0
+        else:  # wait a tick
+            self.mv_intervals[1] += 1
 
     def calculate(self):
         self.racket_movement()

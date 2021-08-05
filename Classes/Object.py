@@ -1,6 +1,14 @@
 from tkinter import Canvas
 
 
+def sgn(x):
+    if x < 0:
+        return -1
+    elif x > 0:
+        return 1
+    return 0
+
+
 class Object:
     def __init__(self, x, y, instance=None):
         self.x = x
@@ -37,6 +45,8 @@ class Object:
         self.y += delta_y
 
     def collides(self, victim, speed_x, speed_y):
+        speed_x = int(speed_x)
+        speed_y = int(speed_y)
         victim_boundaries = [victim.x,
                              victim.y,
                              victim.x + victim.size_x,
@@ -46,8 +56,22 @@ class Object:
                            self.x + self.size_x + speed_x,
                            self.y + self.size_y + speed_y]
 
-        # using separating axis theorem to detect rectangle collision
-        return (victim_boundaries[2] <= self_boundaries[0]
-                or victim_boundaries[3] <= self_boundaries[1]
-                or victim_boundaries[0] >= self_boundaries[2]
-                or victim_boundaries[1] >= self_boundaries[3])
+        ans = False
+
+        if speed_x > speed_y:
+            for i in range(0, speed_x + sgn(speed_x), sgn(speed_x)):
+                # using separating axis theorem to detect rectangle collision
+                if not (victim_boundaries[2] <= self_boundaries[0] + i
+                        or victim_boundaries[3] <= self_boundaries[1] + round(i/float(speed_x))
+                        or victim_boundaries[0] >= self_boundaries[2] + i
+                        or victim_boundaries[1] >= self_boundaries[3] + round(i/float(speed_x))):
+                    return True
+        else:
+            for i in range(0, speed_y + sgn(speed_y), sgn(speed_y)):
+                # using separating axis theorem to detect rectangle collision
+                if not (victim_boundaries[2] <= self_boundaries[0] + round(i / float(speed_y))
+                        or victim_boundaries[3] <= self_boundaries[1] + i
+                        or victim_boundaries[0] >= self_boundaries[2] + round(i / float(speed_y))
+                        or victim_boundaries[1] >= self_boundaries[3] + i):
+                    return True
+        return False

@@ -13,7 +13,7 @@ class Racket(Object):
     name = 'Racket'
     size_x = 10
     size_y = 1
-    movement_interval = 2
+    movement_interval = 1
     speed = 1
 
 
