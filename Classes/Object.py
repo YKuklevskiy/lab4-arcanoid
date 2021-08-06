@@ -2,6 +2,7 @@ import sys
 from tkinter import Canvas
 
 
+# returns 1 if x is positive, -1 if negative, and 0 if zero
 def sgn(x):
     if x < 0:
         return -1
@@ -10,16 +11,18 @@ def sgn(x):
     return 0
 
 
+# base class for all game objects
 class Object:
     def __init__(self, x, y, instance=None):
         self.x = x
         self.y = y
-        self.instance = instance
+        self.instance = instance  # canvas instance of object
 
     name = ''
     size_x = 0
     size_y = 0
 
+    # creates instance on canvas
     def create_object(self, canvas: Canvas):
         if self.instance is None:
             height = int(canvas['height'])
@@ -31,6 +34,7 @@ class Object:
         else:
             print(f"Instance of object {self.name} already exists, please use draw_object")
 
+    # draws object on canvas
     def draw_object(self, canvas: Canvas):
         if self.instance is not None:
             height = int(canvas['height'])
@@ -41,12 +45,13 @@ class Object:
         else:
             print(f"Instance of object {self.name} does not exist, please use create_object")
 
+    # changes object coordinates accordingly
     def move_object(self, delta_x, delta_y):
         self.x += delta_x
         self.y += delta_y
 
-    # returns False, False if no collision is present,
-    # or coordinates of a tile where collision occurs
+    # returns coordinates of collision followed by sides of collision (string),
+    # or None, None, '' if collision didn't happen
     def collision(self, victim, speed_x, speed_y):
         speed_x = int(speed_x)
         speed_y = int(speed_y)
@@ -61,8 +66,10 @@ class Object:
 
         collision = [None, None]
 
+        # loops that basically check if a vector cast from ball position to ball+speed position
+        # intersects with victim object
         if abs(speed_x) > abs(speed_y):
-            for i in range(0, speed_x, sgn(speed_x)):
+            for i in range(0, speed_x + sgn(speed_x), sgn(speed_x)):
                 # using separating axis theorem to detect rectangle collision
                 if not (victim_boundaries[2] <= self_boundaries[0] + i
                         or victim_boundaries[3] <= self_boundaries[1] + round(i/float(speed_x))
@@ -71,7 +78,7 @@ class Object:
                     collision = [self_boundaries[0] + i, self_boundaries[1] + round(i/float(speed_x))]
                     break
         else:
-            for i in range(0, speed_y, sgn(speed_y)):
+            for i in range(0, speed_y + sgn(speed_y), sgn(speed_y)):
                 # using separating axis theorem to detect rectangle collision
                 if not (victim_boundaries[2] <= self_boundaries[0] + round(i / float(speed_y))
                         or victim_boundaries[3] <= self_boundaries[1] + i
@@ -140,7 +147,7 @@ class Object:
                                 side = 'r'
                             else:  # top
                                 side = 't'
-        except Exception:
+        except Exception:  # todo sometimes object gets inside victim before checking for collision, need to fix
             print(sys.exc_info()[0])
             print(f'Ball: [{self.x}, {self.y}]')
             print(f'Collision: [{collision[0]}, {collision[1]}]')

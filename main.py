@@ -19,7 +19,8 @@ racket = Racket(1, 0)
 
 blocks = list()
 
-BLOCK_START_POS_X = 12
+# starting position for block-field
+BLOCK_START_POS_X = 7
 BLOCK_START_POS_Y = 60
 for i in range(3):
     for j in range(14):
