@@ -62,29 +62,24 @@ class ArkanoidManager:
             self.mv_intervals[0] += 1
 
     # get collision info and deltas, handle the collision and return resulting final deltas
-    def check_ball_collision(self, collision, collision_direction, delta_x, delta_y):
-        if collision[2] == 't':
-            print(delta_y)
-            print(int(collision[1]) + 1 - self.ball.y - delta_y)
-            print(int(collision[1]) + 1)
-            delta_y = int((collision[1] + 1 - self.ball.y - delta_y) - (self.ball.y - collision[1] - 1))
-            print(delta_y)
+    def calc_ball_collision(self, collision: tuple[int, int, str], collision_direction, delta_x, delta_y):
+        if collision[2].find('r') != -1:
+            delta_x = int((collision[0] + 1 - self.ball.x - delta_x) - (self.ball.x - collision[0] - 1))
+            collision_direction[0] = not collision_direction[0]
+        if collision[2].find('l') != -1:
+            delta_x = int((collision[0] - self.ball.x - delta_x - self.ball.size_x)
+                          + (collision[0] - self.ball.x - self.ball.size_x))
+            collision_direction[2] = not collision_direction[2]
+        if collision[2].find('t') != -1:
+            delta_y = (int(collision[1]) + 1 - self.ball.y - delta_y) \
+                      - (self.ball.y - int(collision[1]) - 1)
+            collision_direction[3] = not collision_direction[3]
+        if collision[2].find('b') != -1:
+            delta_y = (collision[1] - self.ball.y - delta_y - self.ball.size_y) \
+                      + (collision[1] - self.ball.y - self.ball.size_y)
             collision_direction[1] = not collision_direction[1]
-        elif collision[2] == 'rt':
-            pass
-        elif collision[2] == 'r':
-            pass
-        elif collision[2] == 'rb':
-            pass
-        elif collision[2] == 'b':
-            pass
-        elif collision[2] == 'lb':
-            pass
-        elif collision[2] == 'l':
-            pass
-        elif collision[2] == 'lt':
-            pass
-        pass
+
+        return delta_x, delta_y
 
     # check collision, return final ball displacement
     def check_collisions(self):
@@ -96,27 +91,9 @@ class ArkanoidManager:
         # check racket collision
         racket_collision = self.ball.collision(self.racket, speed[0], speed[1])
         if racket_collision[0] is not None:
-            print(racket_collision)
 
-            if racket_collision[2] == 't':
-                # print(int(racket_collision[1]) + 1 - self.ball.y - delta_y)
-                delta_y = (int(racket_collision[1]) + 1 - self.ball.y - delta_y) \
-                          - (self.ball.y - int(racket_collision[1]) - 1)
-                collision_direction[1] = not collision_direction[1]
-            elif racket_collision[2] == 'rt':
-                pass
-            elif racket_collision[2] == 'r':
-                pass
-            elif racket_collision[2] == 'rb':
-                pass
-            elif racket_collision[2] == 'b':
-                pass
-            elif racket_collision[2] == 'lb':
-                pass
-            elif racket_collision[2] == 'l':
-                pass
-            elif racket_collision[2] == 'lt':
-                pass
+            print(racket_collision)
+            delta_x, delta_y = self.calc_ball_collision(racket_collision, collision_direction, delta_x, delta_y)
 
             if arrow_keys_state[0]:
                 self.ball.speed[0] -= self.racket.speed
@@ -158,6 +135,23 @@ class ArkanoidManager:
             #     if
 
         # check blocks collision
+        all_blocks_checked = False
+        while not all_blocks_checked:
+            all_blocks_checked = True
+            i = 0
+            while i < len(self.blocks):
+                if delta_x == delta_y == 0:  # if ball already moved as much as it could
+                    all_blocks_checked = True
+                    break
+                block_collision = self.ball.collision(self.blocks[i], delta_x, delta_y)
+                if block_collision[0] is not None:
+                    all_blocks_checked = False
+                    delta_x, delta_y = self.calc_ball_collision(block_collision, collision_direction, delta_x, delta_y)
+
+                    self.canvas.delete(self.blocks[i].instance)
+                    del self.blocks[i]
+                    i -= 1
+                i += 1
 
         # check wall collision
         if delta_x > 0:
