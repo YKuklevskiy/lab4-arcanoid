@@ -9,7 +9,7 @@ arrow_keys_state = [False, False]
 def angle(x1, y1, x2, y2):
     y = y2 - y1
     x = x2 - x1
-    return atan(float(y)/x)
+    return atan(float(y) / x)
 
 
 # Class for managing game flow
@@ -20,11 +20,7 @@ class ArkanoidManager:
         self.ball = ball
         self.racket = racket
         self.blocks = blocks
-        self.ball.create_object(self.canvas)
-        self.racket.create_object(self.canvas)
         self.field = [int(canvas['width']) / 8, int(canvas['height']) / 8]
-        for block in self.blocks:
-            block.create_object(self.canvas)
 
     @staticmethod
     def key_pressed(event):
@@ -41,6 +37,10 @@ class ArkanoidManager:
             arrow_keys_state[1] = False
 
     def initialize(self):
+        self.ball.create_object(self.canvas)
+        self.racket.create_object(self.canvas)
+        for block in self.blocks:
+            block.create_object(self.canvas)
         self.window.bind('<Key>', self.key_pressed)
         self.window.bind('<KeyRelease>', self.key_released)
         self.loop()
@@ -53,16 +53,41 @@ class ArkanoidManager:
 
     mv_intervals = [0, 0]  # 1st - ball, 2nd - paddle
 
-    def ball_movement(self):  # todo add speed boost from racket
+    def ball_movement(self):
         if self.mv_intervals[0] >= self.ball.movement_interval - 1:  # ready to move
-            x, y = self.check_collision()
+            x, y = self.check_collisions()
             self.ball.move_object(x, y)
             self.mv_intervals[0] = 0
         else:  # wait a tick
             self.mv_intervals[0] += 1
 
+    # get collision info and deltas, handle the collision and return resulting final deltas
+    def check_ball_collision(self, collision, collision_direction, delta_x, delta_y):
+        if collision[2] == 't':
+            print(delta_y)
+            print(int(collision[1]) + 1 - self.ball.y - delta_y)
+            print(int(collision[1]) + 1)
+            delta_y = int((collision[1] + 1 - self.ball.y - delta_y) - (self.ball.y - collision[1] - 1))
+            print(delta_y)
+            collision_direction[1] = not collision_direction[1]
+        elif collision[2] == 'rt':
+            pass
+        elif collision[2] == 'r':
+            pass
+        elif collision[2] == 'rb':
+            pass
+        elif collision[2] == 'b':
+            pass
+        elif collision[2] == 'lb':
+            pass
+        elif collision[2] == 'l':
+            pass
+        elif collision[2] == 'lt':
+            pass
+        pass
+
     # check collision, return final ball displacement
-    def check_collision(self):
+    def check_collisions(self):
         speed = self.ball.speed
         delta_x = speed[0]
         delta_y = speed[1]
@@ -72,6 +97,27 @@ class ArkanoidManager:
         racket_collision = self.ball.collision(self.racket, speed[0], speed[1])
         if racket_collision[0] is not None:
             print(racket_collision)
+
+            if racket_collision[2] == 't':
+                # print(int(racket_collision[1]) + 1 - self.ball.y - delta_y)
+                delta_y = (int(racket_collision[1]) + 1 - self.ball.y - delta_y) \
+                          - (self.ball.y - int(racket_collision[1]) - 1)
+                collision_direction[1] = not collision_direction[1]
+            elif racket_collision[2] == 'rt':
+                pass
+            elif racket_collision[2] == 'r':
+                pass
+            elif racket_collision[2] == 'rb':
+                pass
+            elif racket_collision[2] == 'b':
+                pass
+            elif racket_collision[2] == 'lb':
+                pass
+            elif racket_collision[2] == 'l':
+                pass
+            elif racket_collision[2] == 'lt':
+                pass
+
             if arrow_keys_state[0]:
                 self.ball.speed[0] -= self.racket.speed
             if arrow_keys_state[1]:
@@ -95,7 +141,6 @@ class ArkanoidManager:
 
             # if side collision, only one delta changes, if corner - both deltas change, the most easy way to do
             # all that is to create a function returning new delta coords in collision class (as objects are rectangles)
-
 
             # check if upper bound collision
 
@@ -131,6 +176,7 @@ class ArkanoidManager:
                 collision_direction[1] = not collision_direction[1]
         else:
             if self.ball.y + delta_y < 0:  # down collision
+                # print('fail')
                 delta_y = (-self.ball.y - delta_y) - self.ball.y
                 collision_direction[3] = not collision_direction[3]
 

@@ -53,10 +53,10 @@ class Object:
                              victim.y,
                              victim.x + victim.size_x,
                              victim.y + victim.size_y]
-        self_boundaries = [self.x + speed_x,
-                           self.y + speed_y,
-                           self.x + self.size_x + speed_x,
-                           self.y + self.size_y + speed_y]
+        self_boundaries = [self.x,
+                           self.y,
+                           self.x + self.size_x,
+                           self.y + self.size_y]
 
         collision = [None, None]
 
