@@ -1,7 +1,15 @@
 from Classes.Objects import *
 from tkinter import Canvas, Tk
+from math import atan
 
 arrow_keys_state = [False, False]
+
+
+# returns an angle (in radians) between a ((x1, y1), (x2, y2)) vector and OX axis
+def angle(x1, y1, x2, y2):
+    y = y2 - y1
+    x = x2 - x1
+    return atan(float(y)/x)
 
 
 # Class for managing game flow
@@ -61,19 +69,21 @@ class ArkanoidManager:
         collision_direction = [False, False, False, False]  # left, up, right, down
 
         # check racket collision
-        if self.ball.collides(self.racket, speed[0], speed[1]):
+        racket_collision = self.ball.collision(self.racket, speed[0], speed[1])
+        if racket_collision[0] is not None:
+            print(racket_collision)
             if arrow_keys_state[0]:
                 self.ball.speed[0] -= self.racket.speed
             if arrow_keys_state[1]:
                 self.ball.speed[0] += self.racket.speed
 
-            collision_x, collision_y = self.ball.collision(self.racket, self.ball.speed[0], self.ball.speed[1])
-            if type(collision_x) != type(bool):
-                ball_velocity = (self.ball.speed[0]**2+self.ball.speed[1]**2)**0.5
-                collision_distance = ((self.ball.x-collision_x)**2+(self.ball.y-collision_y)**2)**0.5
-                angle = (self.ball.y-collision_y)/collision_distance
-                # calculations wrong, bottom left border of ball doesn't collide with bottom left border of object
-                # have to account
+            # collision_x, collision_y = self.ball.collision(self.racket, self.ball.speed[0], self.ball.speed[1])
+            # if type(collision_x) != type(bool):
+            #     ball_velocity = (self.ball.speed[0] ** 2 + self.ball.speed[1] ** 2) ** 0.5
+            #     collision_distance = ((self.ball.x - collision_x) ** 2 + (self.ball.y - collision_y) ** 2) ** 0.5
+            #     angle = (self.ball.y - collision_y) / collision_distance
+            #     # calculations wrong, bottom left border of ball doesn't collide with bottom left border of object
+            #     # have to account
 
             # if not upper racket collision or corner collision, then ball always bounces down to its doom
             # thus no reason to check side collision
@@ -86,8 +96,9 @@ class ArkanoidManager:
             # if side collision, only one delta changes, if corner - both deltas change, the most easy way to do
             # all that is to create a function returning new delta coords in collision class (as objects are rectangles)
 
-            #
-            # # check if upper bound collision
+
+            # check if upper bound collision
+
             # distance_y = self.ball.y - self.racket.y - self.racket.size_y
             # if self.ball.x >= self.racket.x + self.racket.size_x:
             #     distance_x = self.ball.x - self.racket.x - self.racket.size_x
@@ -95,8 +106,9 @@ class ArkanoidManager:
             #         delta_x = (self.racket.x + self.racket.size_x - self.ball.x + delta_x)\
             #                   - (self.ball.x - self.racket.x - self.racket.size_x)
             #         collision_direction[0] = True
+            #     else:  # right side collision
             #
-            # elif self.ball.x <= self.racket.x:
+            # elif self.ball.x + self.ball.size_x <= self.racket.x:
             #     distance_x = self.racket.x - self.ball.x - self.ball.size_x
             #     if
 
@@ -105,7 +117,7 @@ class ArkanoidManager:
         # check wall collision
         if delta_x > 0:
             if self.ball.x + delta_x + self.ball.size_x > self.field[0]:  # right collision
-                delta_x = (self.field[0] - self.ball.x - delta_x - self.ball.size_x)\
+                delta_x = (self.field[0] - self.ball.x - delta_x - self.ball.size_x) \
                           + (self.field[0] - self.ball.x - self.ball.size_x)
                 collision_direction[2] = not collision_direction[2]
         else:
@@ -114,7 +126,7 @@ class ArkanoidManager:
                 collision_direction[0] = not collision_direction[0]
         if delta_y > 0:
             if self.ball.y + delta_y + self.ball.size_y > self.field[1]:  # up collision
-                delta_y = (self.field[1] - self.ball.y - delta_y - self.ball.size_y)\
+                delta_y = (self.field[1] - self.ball.y - delta_y - self.ball.size_y) \
                           + (self.field[1] - self.ball.y - self.ball.size_y)
                 collision_direction[1] = not collision_direction[1]
         else:
