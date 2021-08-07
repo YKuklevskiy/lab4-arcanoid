@@ -21,6 +21,7 @@ class Object:
     name = ''
     size_x = 0
     size_y = 0
+    speed = 0
 
     # creates instance on canvas
     def create_object(self, canvas: Canvas):
@@ -91,65 +92,63 @@ class Object:
         # this is awful
         # ... but simple
         side = ''
-        try:
-            if collision[0] is not None:
-                distance_x = self.x - collision[0]
-                distance_y = self.y - collision[1]
-                if speed_x > 0:  # not anything with r
-                    if speed_y > 0:  # b, lb or l
-                        if collision[0] > victim.x:  # bottom
-                            side = 'b'
-                        elif collision[1] > victim.y:  # left
+        if collision[0] is not None:
+            distance_x = self.x - collision[0]
+            distance_y = self.y - collision[1]
+
+            # workaround of ball getting stuck in objects
+            if distance_y == 0:
+                distance_y = 1
+
+            if speed_x > 0:  # not anything with r
+                if speed_y > 0:  # b, lb or l
+                    if collision[0] > victim.x:  # bottom
+                        side = 'b'
+                    elif collision[1] > victim.y:  # left
+                        side = 'l'
+                    else:
+                        if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
+                            side = 'lb'
+                        elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # left
                             side = 'l'
-                        else:
-                            if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
-                                side = 'lb'
-                            elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # left
-                                print('win')
-                                side = 'l'
-                            else:  # bottom
-                                side = 'b'
-                    else:  # l, lt or t
-                        if collision[0] > victim.x:  # top
-                            side = 't'
-                        elif collision[1] < victim.y + victim.size_y:  # left
-                            side = 'l'
-                        else:
-                            if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
-                                side = 'lt'
-                            elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # left
-                                print('win')
-                                side = 'l'
-                            else:  # top
-                                side = 't'
-                else:
-                    if speed_y > 0:  # b, rb or r
-                        if collision[0] < victim.x + victim.size_x:  # bottom
+                        else:  # bottom
                             side = 'b'
-                        elif collision[1] > victim.y:  # right
-                            side = 'r'
-                        else:
-                            if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
-                                side = 'br'
-                            elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # right
-                                side = 'r'
-                            else:  # bottom
-                                side = 'b'
-                    else:  # t, rt or r
-                        if collision[0] < victim.x + victim.size_x:  # top
+                else:  # l, lt or t
+                    if collision[0] > victim.x:  # top
+                        side = 't'
+                    elif collision[1] < victim.y + victim.size_y:  # left
+                        side = 'l'
+                    else:
+                        if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
+                            side = 'lt'
+                        elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # left
+                            side = 'l'
+                        else:  # top
                             side = 't'
-                        elif collision[1] < victim.y + victim.size_y:  # right
+            else:
+                if speed_y > 0:  # b, rb or r
+                    if collision[0] < victim.x + victim.size_x:  # bottom
+                        side = 'b'
+                    elif collision[1] > victim.y:  # right
+                        side = 'r'
+                    else:
+                        if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
+                            side = 'br'
+                        elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # right
                             side = 'r'
-                        else:
-                            if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
-                                side = 'rt'
-                            elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # right
-                                side = 'r'
-                            else:  # top
-                                side = 't'
-        except Exception:  # todo sometimes object gets inside victim before checking for collision, need to fix
-            print(sys.exc_info()[0])
-            print(f'Ball: [{self.x}, {self.y}]')
-            print(f'Collision: [{collision[0]}, {collision[1]}]')
+                        else:  # bottom
+                            side = 'b'
+                else:  # t, rt or r
+                    if collision[0] < victim.x + victim.size_x:  # top
+                        side = 't'
+                    elif collision[1] < victim.y + victim.size_y:  # right
+                        side = 'r'
+                    else:
+                        if abs(float(distance_x) / distance_y) == abs(float(speed_x) / speed_y):  # corner
+                            side = 'rt'
+                        elif abs(float(distance_x) / distance_y) > abs(float(speed_x) / speed_y):  # right
+                            side = 'r'
+                        else:  # top
+                            side = 't'
 
         return collision[0], collision[1], side

@@ -20,11 +20,11 @@ racket = Racket(1, 0)
 blocks = list()
 
 # starting position for block-field
-BLOCK_START_POS_X = 7
-BLOCK_START_POS_Y = 60
+BLOCK_START_POS_X = 16
+BLOCK_START_POS_Y = 50
 for i in range(3):
-    for j in range(14):
-        blocks.append(Block(BLOCK_START_POS_X + j * (Block.size_x + 2), BLOCK_START_POS_Y + i * (Block.size_y + 2)))
+    for j in range(10):
+        blocks.append(Block(BLOCK_START_POS_X + j * (Block.size_x + 3), BLOCK_START_POS_Y + i * (Block.size_y + 3)))
 
 manager = ArkanoidManager(window, canvas, ball, racket, blocks)
 manager.initialize()

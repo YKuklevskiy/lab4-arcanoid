@@ -11,7 +11,7 @@ class Ball(Object):
 
 class Racket(Object):
     name = 'Racket'
-    size_x = 10
+    size_x = 12
     size_y = 1
     movement_interval = 1
     speed = 1

@@ -89,7 +89,6 @@ class ArkanoidManager:
         racket_collision = self.ball.collision(self.racket, speed[0], speed[1])
         if racket_collision[0] is not None:
 
-            # print(racket_collision)
             delta_x, delta_y = self.calc_ball_collision(racket_collision, collision_direction, delta_x, delta_y)
 
             # change the ball velocity if the racket is moving
@@ -135,7 +134,6 @@ class ArkanoidManager:
                 collision_direction[1] = not collision_direction[1]
         else:
             if self.ball.y + delta_y < 0:  # down collision
-                # print('fail')
                 delta_y = (-self.ball.y - delta_y) - self.ball.y
                 collision_direction[3] = not collision_direction[3]
 
