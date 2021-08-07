@@ -73,10 +73,10 @@ class Object:
             for i in range(0, speed_x + sgn(speed_x), sgn(speed_x)):
                 # using separating axis theorem to detect rectangle collision
                 if not (victim_boundaries[2] <= self_boundaries[0] + i
-                        or victim_boundaries[3] <= self_boundaries[1] + round(i/float(speed_x))
+                        or victim_boundaries[3] <= self_boundaries[1] + round(i / float(speed_x))
                         or victim_boundaries[0] >= self_boundaries[2] + i
-                        or victim_boundaries[1] >= self_boundaries[3] + round(i/float(speed_x))):
-                    collision = [self_boundaries[0] + i, self_boundaries[1] + round(i/float(speed_x))]
+                        or victim_boundaries[1] >= self_boundaries[3] + round(i / float(speed_x))):
+                    collision = [self_boundaries[0] + i, self_boundaries[1] + round(i / float(speed_x))]
                     break
         else:
             for i in range(0, speed_y + sgn(speed_y), sgn(speed_y)):

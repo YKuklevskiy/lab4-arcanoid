@@ -1,17 +1,23 @@
 from Classes.Objects import *
-from tkinter import Canvas, Tk
+from tkinter import Canvas, Tk, Label
+from time import sleep
 
 arrow_keys_state = [False, False]
 
 
 # Class for managing game flow
 class ArkanoidManager:
-    def __init__(self, window: Tk, canvas: Canvas, ball: Ball, racket: Racket, blocks: list):
+    def __init__(self, window: Tk, canvas: Canvas, score: Label, status: Label,
+                 ball: Ball, racket: Racket, blocks: list):
         self.window = window
         self.canvas = canvas
         self.ball = ball
         self.racket = racket
         self.blocks = blocks
+        self.score = score
+        self.status = status
+        self.game_start_ticks = 50  # how many ticks will pass before the start of the game
+        self.blocks_count = len(self.blocks)  # initial quantity of blocks
         self.field = [int(canvas['width']) / 8, int(canvas['height']) / 8]  # block-measurements for game field
 
     # called on any key pressed
@@ -46,6 +52,20 @@ class ArkanoidManager:
         self.racket.draw_object(self.canvas)
         for block in self.blocks:
             block.draw_object(self.canvas)
+
+    # updates scoreboard and checks if all the blocks vere destroyed
+    def update_score(self):
+        self.score.configure(text=f'Score: {str((self.blocks_count - len(self.blocks)) * 100).zfill(3)}')
+        if len(self.blocks) == 0:
+            self.ball.speed = [0, 0]
+
+    # initiates game-over game state
+    def game_over(self):
+        self.status.configure(text='GAME OVER')
+
+    # initiates victory game state
+    def victory(self):
+        self.status.configure(text='VICTORY!', fg='green')
 
     # for managing tick-like movement of ball and racket
     mv_intervals = [0, 0]  # [ball_ticks, racket_ticks]
@@ -111,7 +131,7 @@ class ArkanoidManager:
                     all_blocks_checked = False
                     delta_x, delta_y = self.calc_ball_collision(block_collision, collision_direction, delta_x, delta_y)
 
-                    # deleting the crashed block
+                    # deleting the crushed block, updating score table
                     self.canvas.delete(self.blocks[i].instance)
                     del self.blocks[i]
                     i -= 1
@@ -133,9 +153,10 @@ class ArkanoidManager:
                           + (self.field[1] - self.ball.y - self.ball.size_y)
                 collision_direction[1] = not collision_direction[1]
         else:
-            if self.ball.y + delta_y < 0:  # down collision
-                delta_y = (-self.ball.y - delta_y) - self.ball.y
-                collision_direction[3] = not collision_direction[3]
+            if self.ball.y + delta_y < 0:  # down collision, loss
+                # delta_y = (-self.ball.y - delta_y) - self.ball.y
+                # collision_direction[3] = not collision_direction[3]
+                self.ball.speed = [0, 0]
 
         # changing ball speed if it was reversed by collisions in any way
         if collision_direction[0] != collision_direction[2]:
@@ -171,6 +192,18 @@ class ArkanoidManager:
 
     # game cycle
     def loop(self):
-        self.calculate()
-        self.draw_frame()
-        self.window.after(self._TICK, self.loop)
+        if self.game_start_ticks <= 0:
+            self.calculate()
+            self.update_score()
+            self.draw_frame()
+        else:
+            self.game_start_ticks -= 1
+
+        # check for game state changes, if not - continue game cycle
+        if self.ball.speed != [0, 0]:
+            self.window.after(self._TICK, self.loop)
+        else:
+            if len(self.blocks) == 0:
+                self.victory()
+            else:
+                self.game_over()
